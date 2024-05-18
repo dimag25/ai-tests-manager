@@ -1,11 +1,18 @@
-# Project Title
+### Node.js Test Manager Web Application
+![alt text](image-1.png)
+![alt text](image-2.png)
+Node.js AI Test Manager Web Application
 
-A brief description of what this project does and who it's for.
+### Overview
+The Node.js Test Manager is a web application designed to simplify the process of generating, running, and managing automated tests. Built with a modern UI, the app leverages Node.js for the backend, while providing a sleek, user-friendly interface for seamless interaction. This application supports both Playwright and Selenium test frameworks and includes features for real-time test generation, execution, and detailed reporting.
 
 ## Getting Started
+Clone the repository:
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
-
+```bash
+git clone https://github.com/dimag25/ai-tests-manager.git
+cd ai-tests-manager
+```
 ### Prerequisites
 
 What things you need to install the software and how to install them:
@@ -13,7 +20,7 @@ What things you need to install the software and how to install them:
 - Node.js
 - Python
 - pip (Python package installer)
-- Playwright
+- Playwright/Jest/Selenium
 
 ### Installation
 
@@ -43,14 +50,27 @@ npm init playwright@latest
 This command installs the necessary dependencies and tools required for using Playwright.
 
 ### Usage
-Add additional notes about how to use the project.
+# Generate New Tests
+- Navigate to the "Generate Test" tab.
+- Enter the test description and choose the framework.
+- Optionally, select the video and trace attachments.
+- Click "Generate Test" to create the test script.
+- Monitor the progress bar and wait for the report generation to complete.
+# Run and Manage Tests
+- Navigate to the "Run Tests" tab.
+- View the list of available tests.
+- Click the "Run" button to execute a test.
+- Edit or delete tests using the respective buttons.
 
 ### Contributing
-Details about how to contribute to the project.
+Contributions are welcome! Please fork the repository and submit pull requests for any features, improvements, or bug fixes.
+
 
 ### License
-Add license information here.
+This project is licensed under the MIT License.
 
-```
 
-This template includes sections for project description, prerequisites, installation instructions, usage notes, contribution guidelines, and license information. You can fill in these sections with the appropriate information for your project.
+### Contact
+For any questions or inquiries, please contact:
+LinkedIn: [LinkedIn Profile](https://www.linkedin.com/in/dima-gurevich-7b184194/)
+GitHub: [GitHub Profile](https://github.com/dimag25)
