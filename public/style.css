@@ -1,0 +1,223 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #4CAF50;
+    color: white;
+}
+
+
+.status {
+    font-weight: bold;
+}
+
+.passed {
+    color: green;
+}
+
+.failed {
+    color: red;
+}
+
+
+.edit-button {
+    background-color: #FFA500; /* orange */
+}
+
+.delete-button {
+    background-color: #FF6347; /* tomato */
+}
+
+#editModal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    border: 1px solid #ccc;
+    background-color: white;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+#editor {
+    border: 1px solid #ccc;
+    margin-bottom: 20px;
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    background-color: #333;
+}
+
+.tablink {
+    background-color: inherit;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: rgb(66, 48, 48);
+    transition: background-color 0.3s;
+}
+
+.tablink:hover, .tablink.active {
+    background-color: #4CAF50;
+}
+
+.tabcontent {
+    display: none;
+    padding: 20px;
+    border: 1px solid #b66868;
+    border-top: none;
+}
+
+dialog {
+    border: none;
+    border-radius: 5px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+}
+
+.icon {
+    color: #4CAF50;
+    cursor: pointer;
+}
+
+.message {
+    background: green;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.message-container {
+    margin-top: 20px;
+}
+
+.message.error {
+    background: red;
+}
+
+.button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 4px 2px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border-radius: 5px;
+}
+
+.button:hover {
+    background-color: #45a049;
+}
+
+.progress {
+    width: 100%;
+    height: 20px;
+    background-color: #f4f4f4;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress::after {
+    content: '';
+    display: block;
+    height: 100%;
+    width: 0;
+    background-color: #4CAF50;
+    transition: width 0.3s;
+    position: absolute;
+    left: 0;
+    top: 0;
+}
+
+.styled-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    margin-top: 10px;
+}
+
+.styled-button:hover {
+    background-color: #45a049;
+}
+
+.styled-select {
+    padding: 10px;
+    width: 200px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.styled-checkbox {
+    display: inline-block;
+    position: relative;
+    padding-left: 25px;
+    margin-right: 15px;
+    cursor: pointer;
+    font-size: 16px;
+}   
+
+.styled-checkbox input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.styled-checkbox input:checked ~ .checkmark {
+    background-color: #4CAF50;
+}
+
+.styled-textarea {
+    width: 95%;
+    height: 150px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    resize: none;
+}

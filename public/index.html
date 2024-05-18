@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Management</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js"></script>
+</head>
+<body>
+    <nav class="sidebar">
+        <button class="tablink" onclick="openTab(event, 'Generate')">Generate Test</button>
+        <button class="tablink" onclick="openTab(event, 'RunTests')">Run Tests</button>
+        <button class="tablink" onclick="openTab(event, 'About')">About</button>
+        <button class="tablink" onclick="openTab(event, 'Guide')">Guide</button>
+    </nav>
+
+    <div class="content">
+        <section id="Generate" class="tabcontent">
+            <h2>Generate New Test</h2>
+            <label for="frameworkSelect">UI Framework</label><br>
+            <select id="frameworkSelect" class="styled-select">
+                <option value="playwright">Playwright</option>
+                <option value="selenium">Selenium</option>
+            </select><br><br>
+            <label for="testToolSelect">Testing Language</label><br>
+            <select id="testToolSelect" class="styled-select">
+                <option value="Python">Python</option>
+                <option value="Javascript">Javascript</option>
+            </select><br><br>
+            <label class="checkbox">
+                <input type="checkbox" id="includeVideo"> Attach Video
+            </label>
+            <label class="checkbox">
+                <input type="checkbox" id="includeScreenshots"> Attach Screenshots
+            </label><br><br>
+            <textarea id="testDescription" class="styled-textarea" placeholder="Enter test description..."></textarea>
+            <button onclick="generateNewTest()" class="styled-button" id="generateNewTest">Generate Test</button>
+            <div id="messageContainer" class="message-container"></div>
+            <pre id="generationResult"></pre>
+        </section>
+
+        <section id="RunTests" class="tabcontent">
+            <h2>Available Tests</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Test Name</th>
+                        <th>Run Test</th>
+                        <th>Edit</th>
+                        <th>Delete</th>
+                        <th>Test Result</th>
+                        <th>Report</th>
+                        <th>Status</th>
+                        <th>Duration</th>
+                    </tr>
+                </thead>
+                <tbody id="testTable">
+                    <!-- Test rows will be populated here -->
+                </tbody>
+            </table>
+        </section>
+
+        <section id="About" class="tabcontent">
+            <h2>About</h2>
+            <p>
+                <a href="https://www.linkedin.com/in/dima-gurevich-7b184194/" target="_blank">
+                    <i class="fab fa-linkedin"></i> LinkedIn
+                </a>
+                <a href="https://github.com/dimag25" target="_blank">
+                    <i class="fab fa-github"></i> GitHub
+                </a>
+            </p>
+        </section>
+
+        <section id="Guide" class="tabcontent">
+            <h2>Guide</h2>
+            <h3>How to Use the App</h3>
+            <p>Instructions on how to use the app...</p>
+            <h3>Installations</h3>
+            <p>Details on installations...</p>
+            <h3>Examples of Test Creation</h3>
+            <p>Examples...</p>
+        </section>
+    </div>
+
+    <dialog id="editModal" style="display:none;">
+        <div id="editor" style="width: 600px; height: 400px;"></div>
+        <button onclick="saveChanges()" class="styled-button">Save Changes</button>
+        <button onclick="copyToClipboard()" class="styled-button">Copy to Clipboard</button>
+        <button onclick="closeEditor()" class="styled-button">Close Editor</button>
+    </dialog>
+    <script src="main.js"></script>
+    <script src="reports.js"></script>
+    <script src="testGeneration.js"></script>
+    <script src="testsTableLogic.js"></script>
+</body>
+</html>
