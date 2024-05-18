@@ -49,6 +49,17 @@ npm init playwright@latest
 ```
 This command installs the necessary dependencies and tools required for using Playwright.
 
+
+### Step 4: Insert Your OPENAI API_KEY .env
+```bash
+OPENAI_API_KEY=<INSERT_YOUR_KEY>
+```
+
+### Step 5 : Run Server
+```bash
+npm start
+```
+
 ### Usage
 # Generate New Tests
 - Navigate to the "Generate Test" tab.
@@ -56,6 +67,7 @@ This command installs the necessary dependencies and tools required for using Pl
 - Optionally, select the video and trace attachments.
 - Click "Generate Test" to create the test script.
 - Monitor the progress bar and wait for the report generation to complete.
+
 # Run and Manage Tests
 - Navigate to the "Run Tests" tab.
 - View the list of available tests.
