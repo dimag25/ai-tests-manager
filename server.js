@@ -6,10 +6,9 @@ const testRoutes = require('./server/routes/tests');
 const cors = require('cors');
 const path = require('path'); 
 const fs = require('fs');
-const { exec, spawn } = require('child_process');
-let allureProcess = null; // Global variable to manage the Allure report server process
-
+const { exec } = require('child_process');
 const winston = require('winston');
+
 // Create a logger instance
 const logger = winston.createLogger({
     level: 'info',
@@ -23,10 +22,6 @@ const logger = winston.createLogger({
     ),
     defaultMeta: { service: 'user-service' },
     transports: [
-        //
-        // - Write all logs with level `info` and below to `combined.log` 
-        // - Write all logs with level `error` and below to `error.log`.
-        //
         new winston.transports.File({ filename: 'error.log', level: 'error' }),
         new winston.transports.File({ filename: 'combined.log' })
     ]
@@ -39,30 +34,27 @@ if (process.env.NODE_ENV !== 'production') {
         format: winston.format.simple()
     }));
 }
-const app = express();
-// Import the routes
 
+const app = express();
 app.use(bodyParser.json());
 app.use('/api', apiRoutes);
-// Use the test routes
 app.use('/tests', testRoutes);
-// Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
-
-// Serve static files from each test's report directory
 app.use('/reports', express.static(path.join(__dirname, 'allure-report')));
 
-// Middleware to log all requests
 app.use((req, res, next) => {
     logger.info(`${req.method} ${req.url}`);
     next();
 });
 
-// Handle errors
 app.use((err, req, res, next) => {
     logger.error('Error: %s', err.stack);
     res.status(500).send('Something broke!');
 });
+
+// In-memory storage for report statuses and logs
+const reportStatuses = {};
+const testLogs = {};
 
 // List tests
 app.get('/tests', (req, res) => {
@@ -86,31 +78,30 @@ app.get('/run-test/:testFile', async (req, res) => {
     const testFileName = req.params.testFile;
     const testFilePath = path.join(__dirname, 'tests', 'generated', testFileName);
     const testFilePathExtention = path.extname(testFilePath);
+    const testName = path.basename(testFileName, testFilePathExtention);
+
     const resultDir = path.join(__dirname, 'allure-results', path.basename(testFileName, testFilePathExtention));
     const reportDir = path.join(__dirname, 'allure-report', path.basename(testFileName, testFilePathExtention));
 
-    // Ensure result and report directories exist
     fs.mkdirSync(resultDir, { recursive: true });
     fs.mkdirSync(reportDir, { recursive: true });
 
     try {
         await cleanAllureReports(resultDir, reportDir);
         if (testFilePathExtention === '.py') {
-            await runPyTest(testFilePath, resultDir, reportDir, req, res);
-        }
-        else if (testFilePathExtention == '.js') { 
+            await runPyTest(testName, testFilePath, resultDir, reportDir, req, res);
+        } else if (testFilePathExtention == '.js') { 
             let testTool;
             if (testFileName.includes('spec.js')) {
                 testTool = 'Playwright';
-            }
-            else {
+            } else {
                 testTool = 'Jest';
             }
-            await runJSTest(testFilePath, resultDir, reportDir, testTool, req, res);
+            await runJSTest(testName, testFilePath, reportDir, resultDir, testTool, req, res);
         }
-        await generateAllureReport(resultDir, reportDir);
+        await generateAllureReport(resultDir, reportDir, testFileName);
         res.json({
-            message: `${req.params.testFile} Finished Succesfuly.\n click on the link to see the report`,
+            message: `${req.params.testFile} Finished Successfully.\n click on the link to see the report`,
             status: 'Passed',
             reportUrl: `/reports/${path.basename(testFileName, testFilePathExtention)}/index.html`
         });
@@ -120,44 +111,63 @@ app.get('/run-test/:testFile', async (req, res) => {
     }
 });
 
-async function runPyTest(testFilePath, resultDir,reportDir, req, res) {
+async function runPyTest(testName, testFilePath, resultDir, reportDir, req, res) {
+    const logFilePath = path.join(__dirname, `logs/${testName}.log`);
     return new Promise((resolve, reject) => {
-        exec(`pytest ${testFilePath} --alluredir=${resultDir}`, async (error) => {
+        exec(`pytest ${testFilePath} --alluredir=${resultDir} > ${logFilePath} 2>&1`, async (error) => {
             if (error) {
+                reportStatuses[testName] = 'failed';
+                testLogs[testName] = fs.readFileSync(logFilePath, 'utf8');
+                await generateAllureReport(resultDir, reportDir, req.params.testFile);
                 res.status(500).json({
-                    message: `${req.params.testFile} PyTest Failed: ${error}\n click on the link to see the report`,
-                    status: 'Failed',
-                    reportUrl: `/reports/${path.basename(req.params.testFile, '.py')}/index.html`
+                    status: 'failed', message: 'Test run failed',
+                    reportUrl: `/reports/${testName}/index.html`, logUrl: `/logs/${testName}`
                 });
-                await generateAllureReport(resultDir, reportDir);
-                //reject(new Error(`PyTest failed: ${error}`));
             } else {
-                resolve();
+                reportStatuses[testName] = 'success';
+                testLogs[testName] = fs.readFileSync(logFilePath, 'utf8');
+                await generateAllureReport(resultDir, reportDir, req.params.testFile);
+                res.json({
+                    status: 'success', message: 'Test run succeeded',
+                    reportUrl: `/reports/${testName}/index.html`, logUrl: `/logs/${testName}`
+                });
             }
         });
     });
 }
 
-async function runJSTest(testFilePath, resultDir, reportDir, testTool, req, res) {
-    let js_cmd =  testTool === 'Playwright' ? 'npx playwright test' : 'npx jest'; 
+async function runJSTest(testName, testFilePath, resultDir, reportDir, testTool, req, res) {
+    const js_cmd = testTool === 'Playwright' ? `npx playwright test --reporter=allure-playwright --output=${resultDir}` : `npx jest --testResultsProcessor=jest-allure-reporter --outputDirectory=${resultDir}`; 
+    const logFilePath = path.join(__dirname, `logs/${testName}.log`);
     return new Promise((resolve, reject) => {
-        exec(`${js_cmd} ${testFilePath}`, async (error) => {
+        exec(`${js_cmd} ${testFilePath}  > ${logFilePath} 2>&1`, async (error) => {
             if (error) {
-                res.status(500).json({
-                    message: `${req.params.testFile} JS Test Failed: ${error}\n click on the link to see the report`,
-                    status: 'Failed',
-                    reportUrl: `/reports/${path.basename(req.params.testFile, '.js')}/index.html`
+                reportStatuses[testFilePath] = 'failed';
+                testLogs[testFilePath] = fs.readFileSync(logFilePath, 'utf8');
+                await generateAllureReport(resultDir, reportDir, req.params.testFile);
+                res.json({
+                    status: 'failed', message: 'Test run failed',
+                    reportUrl: `/reports/${testName}/index.html`, logUrl: `/logs/${testName}`
                 });
-                await generateAllureReport(resultDir, reportDir);
-                //reject(new Error(`JS Test failed: ${error}`));
             } else {
-                resolve();
+                reportStatuses[testFilePath] = 'success';
+                testLogs[testFilePath] = fs.readFileSync(logFilePath, 'utf8');
+                await generateAllureReport(resultDir, reportDir, req.params.testFile);
+                res.json({
+                    status: 'success', message: 'Test run succeeded',
+                    reportUrl: `/reports/${testName}/index.html`, logUrl: `/logs/${testName}`
+                });
             }
         });
     });
 }
 
-async function generateAllureReport(resultDir, reportDir) {
+async function generateAllureReport(resultDir, reportDir, testName) {
+    reportStatuses[testName] = 'generating';
+    setTimeout(() => {
+        reportStatuses[testName] = 'ready';
+    }, 10000); // Simulating a 10-second report generation process
+
     return new Promise((resolve, reject) => {
         exec(`allure generate ${resultDir} -o ${reportDir} --clean`, (error) => {
             if (error) {
@@ -171,13 +181,24 @@ async function generateAllureReport(resultDir, reportDir) {
 
 async function cleanAllureReports(resultDir, reportDir) {
     if (fs.existsSync(resultDir)) { 
-            fs.rmdirSync(resultDir, { recursive: true });
+        fs.rmdirSync(resultDir, { recursive: true });
     }
     if (fs.existsSync(reportDir)) { 
         fs.rmdirSync(reportDir, { recursive: true });
     }
 }
 
+app.get('/api/report-status/:testName', (req, res) => {
+    const { testName } = req.params;
+    const status = reportStatuses[testName] || 'not_found';
+    res.json({ status });
+});
+
+app.get('/logs/:testName', (req, res) => {
+    const { testName } = req.params;
+    const logFilePath = path.join(__dirname, `logs/${testName}.log`);
+    res.sendFile(logFilePath);
+});
 
 const PORT = 3000;
 app.use(cors({}));
