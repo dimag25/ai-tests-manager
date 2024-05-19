@@ -1,11 +1,9 @@
-// testsTableLogic.js
-
 document.addEventListener('DOMContentLoaded', function() {
     fetchTests();
 });
 
 function fetchTests() {
-        fetch('/tests')
+    fetch('/tests')
         .then(response => response.json())
         .then(tests => {
             const table = document.getElementById('testTable');
@@ -30,97 +28,81 @@ function fetchTests() {
                 deleteButton.onclick = () => deleteTest(test.name);
                 deleteCell.appendChild(deleteButton);
 
-                runButton.onclick = () => runTest(test.name, row, runCell);
-
+                row.insertCell(4); // Placeholder for Test result
+                row.insertCell(5); // Placeholder for report link
+                const statusCell = row.insertCell(6);
+                const timeCell = row.insertCell(7);
+                runButton.onclick = () => runTest(test.name, row, runCell, statusCell, timeCell);
             });
         })
-        .catch(error => console.error('Failed to fetch tests: ', error));
-    }
+        .catch(error => console.error('Failed to fetch tests:', error));
+}
 
-     
-function runTest(testName, row, runCell) {
-        showMessage(`Running Test: ${testName}`)
-        row.insertCell(4); // Placeholder for Test result
-        row.insertCell(5); // Placeholder for report link
-        const testResult = row.cells[4];
-        const reportCell = row.cells[5];
-        const reportIcon = document.createElement('i');
-        reportIcon.className = 'fas fa-file-alt icon';
-        reportCell.appendChild(reportIcon);
-        const statusCell = row.insertCell(6);
-        statusCell.textContent = 'Pending';
-        statusCell.className = 'status';
+function runTest(testName, row, runCell, statusCell, timeCell) {
+    showMessage(`Running Test: ${testName}`);
+    const testResult = row.cells[4];
+    const reportCell = row.cells[5];
+    const reportIcon = document.createElement('i');
+    reportIcon.className = 'fas fa-file-alt icon';
+    reportCell.appendChild(reportIcon);
+    statusCell.textContent = 'Pending';
+    statusCell.className = 'status';
+    timeCell.textContent = 'Not run yet';
 
-        const timeCell = row.insertCell(7);
-        timeCell.textContent = 'Not run yet';
-        
-        const progressBar = document.createElement('progress');
-        runCell.appendChild(progressBar);
-        progressBar.value = 0;
-        progressBar.max = 100;
-        let progress = 0;
-        const progressInterval = setInterval(() => {
-            progress += 10;
-            progressBar.value = progress;
-        }, 1000);
+    const progressBar = document.createElement('progress');
+    runCell.appendChild(progressBar);
+    progressBar.value = 0;
+    progressBar.max = 100;
+    let progress = 0;
+    const progressInterval = setInterval(() => {
+        progress += 10;
+        progressBar.value = progress;
+    }, 1000);
 
-        const startTime = new Date();
-        fetch(`/run-test/${testName}`)
-        .then(response => response.json())   
-            .then(data => {
+    const startTime = new Date();
+    fetch(`/run-test/${testName}`)
+        .then(response => response.json())
+        .then(data => {
             clearInterval(progressInterval);
-                progressBar.value = 100;
-                // Simulate a test run with a timeout
+            progressBar.value = 100;
+
+            // Simulate a test run with a timeout
             setTimeout(() => {
                 clearInterval(progressInterval);
                 progressBar.value = 100;
-                testResult.innerHTML = `Test Run Finished \n\n Status: ${data.status} \n\n Message : ${data.message}`;
+                testResult.innerHTML = `<a href="${data.logUrl}" target="_blank">${data.message}<br> View Log</a>`; // Update with log link
             }, 10000);
-            showMessage(`Test Run Finished: ${testName}`)    
-            createReportProgressCell(reportCell, testName);    
+
+            showMessage(`Test Run Finished: ${testName}`);
+            // Show the progress bar and start checking the report status
+            showProgressBar();
+            checkReportStatus(testName);
+
             if (!data.reportUrl) {
-                testResult.innerHTML = 'Failed to generate report URL';
-                showMessage('Failed to generate report', false);
-                console.log(data);
+                reportCell.textContent = 'Failed to generate report.';
+                showMessage('Failed to generate report.', false);
                 return;
-                }
-            
+            }
+
             const endTime = new Date();
             const duration = (endTime - startTime) / 1000; // Duration in seconds
-
             statusCell.textContent = data.status; // Update based on actual test result
-            statusCell.className = 'status passed';
+            statusCell.className = data.status === 'success' ? 'status passed' : 'status failed';
             timeCell.textContent = `${duration} seconds`;
-            testResult.textContent = data.message;
-            reportCell.firstChild.href = data.reportUrl; // Update the report link
-            showMessage(`Report Link Ready: ${data.reportUrl}`)
-            reportCell.firstChild.target = '_blank';
-            reportCell.onclick = () => {
-                window.open(data.reportUrl, '_blank');
-                };
-            // reportCell.innerHTML = `<a href="${data.reportUrl}" target="_blank">View Report</a>`;
-            //reportCell.innerHTML = `<iframe src="${data.reportUrl}" frameborder="0" style="width:100%; height:400px;"></iframe>`;
+            testResult.innerHTML = `<a href="${data.logUrl}" target="_blank">${data.message}<br> View Log</a>`; // Update with log link
+            reportCell.innerHTML = `<a href="${data.reportUrl}" target="_blank">Report is Ready</a>`; // Update the report link
         })
-            .catch(error => {
+        .catch(error => {
             clearInterval(progressInterval);
             statusCell.textContent = 'Failed';
             statusCell.className = 'status failed';
             testResult.innerHTML = 'Error running test: ' + error.message;
-            reportCell.firstChild.href = data.reportUrl; // Update the report link
-            showMessage(`Error running test: ${error.message}`, false)    
-            //showMessage(`Report Link Ready: ${data.reportUrl}`)
-            reportCell.firstChild.target = '_blank';
-            reportCell.onclick = () => {
-                window.open(data.reportUrl, '_blank');
-                };
             console.error(error);
-                     
         });
 }
-    
 
-    function editTest(filename) {
-        fetch(`/tests/${filename}`)
+function editTest(filename) {
+    fetch(`/tests/${filename}`)
         .then(response => response.text())
         .then(data => {
             const editor = ace.edit("editor");
@@ -155,29 +137,49 @@ function runTest(testName, row, runCell) {
             window.closeEditor = function() {
                 editModal.style.display = 'none'; // Hide the modal
             };
+
+            window.fixTestCode = function() {
+                const testContent = editor.getValue();
+                const userPrompt = prompt("Describe the problem or the desired fix:");
+
+                fetch('/api/fix-test', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ testName: filename, testContent, prompt: userPrompt })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    editor.setValue(data.fixedCode, -1); // Update editor with the fixed code
+                    showMessage('Test code fixed. Please review and save changes.');
+                })
+                .catch(error => {
+                    console.error('Error fixing test code:', error);
+                    showMessage('Failed to fix test code.', false);
+                });
+            };
+        });
+}
+
+function saveTest(filename, content) {
+    fetch(`/tests/${filename}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content })
+    })
+    .then(response => response.text())
+    .then(message => showMessage(message));
+}
+
+function deleteTest(filename) {
+    if (confirm('Are you sure you want to delete this test?')) {
+        fetch(`/tests/${filename}`, { method: 'DELETE' })
+        .then(response => response.text())
+        .then(message => {
+            showMessage(message);
+            fetchTests();  // Refresh the list after deletion
         });
     }
-    function saveTest(filename, content) {
-        fetch(`/tests/${filename}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ content })
-        })
-        .then(response => response.text())
-        .then(message => showMessage(message));
-    }
-
-    function deleteTest(filename) {
-        if (confirm('Are you sure you want to delete this test?')) {
-            fetch(`/tests/${filename}`, { method: 'DELETE' })
-            .then(response => response.text())
-            .then(message => {
-                showMessage(message);
-                fetchTests();  // Refresh the list after deletion
-            });
-        }
 }
-    
 
 function showMessage(text, isSuccess = true) {
     let msg = document.createElement('div');
@@ -186,4 +188,41 @@ function showMessage(text, isSuccess = true) {
     document.body.appendChild(msg);
     msg.style.display = 'block';
     setTimeout(() => msg.remove(), 3000);
+}
+
+function checkReportStatus(testName) {
+    fetch(`/api/report-status/${testName}`)
+    .then(response => response.json())
+    .then(data => {
+        const progressBar = document.getElementById('progressBar');
+        const progressMessage = document.getElementById('progressMessage');
+
+        if (data.status === 'ready') {
+            progressBar.style.width = '100%';
+            progressMessage.textContent = 'Report is ready!';
+            showMessage('Report generated successfully!');
+            document.getElementById('generationResult').textContent = `Report URL: /reports/${testName}.html`;
+        } else if (data.status === 'generating') {
+            progressBar.style.width = `${Math.min(progressBar.clientWidth + 10, 100)}%`;
+            progressMessage.textContent = 'Report is generating...';
+            setTimeout(() => checkReportStatus(testName), 1000);
+        } else {
+            progressMessage.textContent = 'Failed to generate report.';
+            showMessage('Failed to generate report.', false);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showMessage('Failed to check report status.', false);
+    });
+}
+
+function showProgressBar() {
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
+    const progressMessage = document.getElementById('progressMessage');
+
+    progressBar.style.width = '0%';
+    progressMessage.textContent = 'Report is generating...';
+    progressContainer.style.display = 'block';
 }
