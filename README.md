@@ -38,7 +38,7 @@ This command installs all the dependencies listed in the package.json file.
 #### Step 2: Install Pytest Dependencies
 To install the Python/pytest dependencies, run the following command:
 ```bash
-pip install pytest pytest-playwright allure-pytest
+pip install pytest pytest-playwright allure-pytest selenium
 ```
 
 #### Step 3: Install Playwright Dependencies
