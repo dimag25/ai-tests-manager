@@ -1,26 +1,25 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from 'react';
+import Sidebar from './components/Sidebar';
+import GenerateTest from './components/GenerateTest';
+import RunTests from './components/RunTests';
+import About from './components/about';
+import Guide from './components/Guide';
+import { AppContainer, Content } from './components/styles';
 
-function App() {
+const App: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<string>('Generate');
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <AppContainer>
+      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      <Content>
+        {activeTab === 'Generate' && <GenerateTest />}
+        {activeTab === 'RunTests' && <RunTests />}
+        {activeTab === 'About' && <About />}
+        {activeTab === 'Guide' && <Guide />}
+      </Content>
+    </AppContainer>
   );
-}
+};
 
 export default App;
