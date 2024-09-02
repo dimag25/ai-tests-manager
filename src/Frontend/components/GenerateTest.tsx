@@ -93,7 +93,7 @@ const GenerateTest: React.FC = () => {
 
       <Button onClick={generateNewTest}>Generate Test</Button>
 
-      <ProgressBar progress={progress} />
+      <ProgressBar/>
       <ProgressMessage>{message}</ProgressMessage>
     </div>
   );

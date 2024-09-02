@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Table, TableHeader, TableRow, TableCell, Button, StatusCell, Select, Option, Alert } from './styles';
+import { Table, TableRow, TableHeader, TableCell, Button, StatusCell, Select, Option, Alert } from './styles';
 import EditModal from './EditModal';
 import { report } from 'process';
 import { error } from 'console';
