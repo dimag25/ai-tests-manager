@@ -1,46 +1,92 @@
-# Getting Started with Create React App
+### GenAI Test Manager Web Application
+![alt text](image-1.png)
+![alt text](image-2.png)
+Gen AI Test Manager Web Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+### Overview
+The GenAI Test Manager is a web application designed to simplify the process of generating, running, and managing automated tests. Built with a modern react Web UI, the app leverages Node.js for the backend, while providing a sleek, user-friendly interface for seamless interaction. This application supports both Playwright and Selenium test frameworks and includes features for real-time test generation, execution, and detailed reporting.
 
-## Available Scripts
+## Getting Started
+Clone the repository:
 
-In the project directory, you can run:
+```bash
+git clone https://github.com/dimag25/ai-tests-manager.git
+cd ai-tests-manager
+```
+### Prerequisites
 
-### `npm start`
+What things you need to install the software and how to install them:
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+- Node.js
+- Python
+- pip (Python package installer)
+- Playwright/Jest/Selenium
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+### Installation
 
-### `npm test`
+A step by step series of examples that tell you how to get a development environment running.
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+#### Step 1: Install Node.js Dependencies
 
-### `npm run build`
+To install the Node.js dependencies, navigate to the project directory in your terminal and run the following command:
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+```bash
+npm install
+```
+This command installs all the dependencies listed in the package.json file.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+#### Step 2: Install Python Dependencies
+To install the Python/pytest dependencies, run the following command:
+```bash
+brew install pipx
+pipx install pytest
+python3 -m venv ./venv
+source venv/bin/activate
+python3 -m pip install pytest playwright allure-pytest selenium
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+#### Step 3: Install Playwright Dependencies
+To install Playwright, a Node.js library for browser automation, run the following command:
+```bash
+playwright install
+npm init playwright@latest
+```
+This command installs the necessary dependencies and tools required for using Playwright.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### Step 4: Insert Your OPENAI API_KEY .env
+```bash
+OPENAI_API_KEY=<INSERT_YOUR_KEY>
+```
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Step 5 : Run Server
+```bash
+npm start
+```
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Usage
+# Generate New Tests
+- Navigate to the "Generate Test" tab.
+- Enter the test description and choose the framework.
+- Optionally, select the video and trace attachments.
+- Click "Generate Test" to create the test script.
+- Monitor the progress bar and wait for the report generation to complete.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+# Run and Manage Tests
+- Navigate to the "Run Tests" tab.
+- View the list of available tests.
+- Click the "Run" button to execute a test.
+- Edit or delete tests using the respective buttons.
 
-## Learn More
+### Contributing
+Contributions are welcome! Please fork the repository and submit pull requests for any features, improvements, or bug fixes.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+### License
+This project is licensed under the MIT License.
+
+
+### Contact
+For any questions or inquiries, please contact:
+LinkedIn: [LinkedIn Profile](https://www.linkedin.com/in/dima-gurevich-7b184194/)
+GitHub: [GitHub Profile](https://github.com/dimag25)
