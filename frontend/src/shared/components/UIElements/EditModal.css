@@ -1,0 +1,33 @@
+.editor-dialog {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 55%;      /* Ensure full width at the bottom */
+    max-width: 100%;   /* Make sure it doesn't exceed screen width */
+    background-color: white;
+    border: none;      /* Remove default dialog border */
+    padding: 1rem;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.2);
+    margin: 0;
+    z-index: 1000;     /* Ensure it's on top of other content */
+  }
+  
+  #editor {
+    margin-bottom: 1rem;
+  }
+  
+  .modal-actions {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .styled-button {
+    margin: 0 0.5rem;
+  }
+  
+  .message {
+    margin-top: 1rem;
+    text-align: center;
+  }
+  

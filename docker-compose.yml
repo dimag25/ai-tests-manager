@@ -1,0 +1,28 @@
+version: '3'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    platform: linux/amd64  
+    working_dir: /app
+    command: npm run dev   # <-- Run both frontend and backend concurrently
+    ports:
+      - "8080:8080"        # Frontend port
+      - "5000:5000"        # Backend port
+      - "4000-4100:4000-4100"  # Report ports (adjusted to range 4000-4100)
+    networks:
+      - heroku-network
+    volumes:
+      - ./frontend:/app/frontend
+      - ./backend:/app/backend
+      - ./tests:/app/tests
+      - /app/backend/node_modules  # Ensure backend's node_modules is mounted
+      - /app/frontend/node_modules  # Ensure frontend's node_modules is mounted
+
+    container_name: ai-tests-mgmt-app
+    environment:
+      - PORT=8080
+networks:
+  heroku-network:
+    driver: bridge

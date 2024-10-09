@@ -1,0 +1,52 @@
+.form-control {
+  margin: 1rem 0;
+}
+
+.form-control label,
+.form-control input,
+.form-control textarea {
+  display: block;
+}
+
+.form-control label {
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+}
+
+.form-control input{
+  width: 100%;
+  font: inherit;
+  border: 1px solid #ccc;
+  background: #ebebeb;
+  padding: 0.15rem 0.25rem;
+}
+
+.form-control textarea {
+  width: 100%;  
+  font: inherit;
+  border: 1px solid #ccc;
+  background: #ebebeb;
+  padding: 0.5rem 0.75rem;  /* Increased padding */
+  line-height: 1.5;        /* Increase line height for more space between lines */
+  border-radius: 4px;       /* Adds some rounded corners for a cleaner look */
+  min-height: 550px;        /* Ensures a minimum height for more space */
+  resize: vertical;         /* Allows vertical resizing by the user */
+}
+
+.form-control input:focus,
+.form-control textarea:focus {
+  outline: none;
+  background: #ebebeb;
+  border-color: #510077;
+}
+
+.form-control--invalid label,
+.form-control--invalid p {
+  color: red;
+}
+
+.form-control--invalid input,
+.form-control--invalid textarea {
+  border-color: red;
+  background: #ffd1d1;
+}
