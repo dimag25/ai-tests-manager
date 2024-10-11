@@ -32,6 +32,12 @@ ENV PATH="${JAVA_HOME}/bin:${PATH}"
 # Install allure cmd globally via npm
 RUN npm install -g allure-commandline --save-dev
 
+# Install concurrently globally via npm
+RUN npm install -g concurrently --save-dev
+
+# Install react-scripts globally via npm
+RUN npm install -g react-scripts --save-dev
+
 # Install Playwright browsers and dependencies
 RUN apt-get update && apt-get install -y \
     libnss3 libatk-bridge2.0-0 libcups2 libxkbcommon-x11-0 libgbm-dev \
